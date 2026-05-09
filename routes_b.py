@@ -60,3 +60,13 @@ def partial_update_food(food_id: int, food_update: FoodUpdate, session: Session 
     session.commit()
     session.refresh(food)
     return food
+
+@router.delete("/{food_id}", status_code=204)
+def delete_food(food_id: int, session: Session = Depends(get_session)):
+    food = session.get(Food, food_id)
+    if not food:
+        raise HTTPException(status_code=404, detail="Food not found")
+    
+    session.delete(food)
+    session.commit()
+    return None
