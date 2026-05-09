@@ -3,11 +3,21 @@
 
 ## O projektu
 
-[Ovdje ukratko opišite domenu vaše aplikacije i njenu svrhu]
+Ovaj repozitorij sadrži backend aplikaciju za sistem dostave hrane, razvijenu pomoću **FastAPI** okvira i **SQLModel** biblioteke za upravljanje bazom podataka.
+
+## Domena i svrha aplikacije
+**Domena:** Ova aplikacija pripada domeni dostave hrane i upravljanja ugostiteljskim resursima. Sistem je dizajniran da simulira backend platforme za naručivanje hrane.
+
+**Svrha:** 
+Glavna svrha aplikacije je omogućiti **digitalnu evidenciju i upravljanje podacima o restoranima i njihovoj ponudi jela**. API je dizajniran da administratorima i partnerima omogući:
+
+* **Upravljanje restoranima:** Praćenje informacija o radnom vremenu, lokaciji, tipu kuhinje i ocjenama korisnika.
+* **Upravljanje ponudom jela:** Evidenciju dostupnih jela, njihovih cijena, kategorija i nutritivnih informacija.
+* **Pretragu i filtriranje:** Brzi uvid u to koji su restorani trenutno otvoreni ili koja su jela dostupna u određenom cjenovnom rangu.
 
 ## Tim
 
-- **Student A**: [Lamija Altumbabić] - resurs: `/restaurants`
+- **Student A**: Lamija Altumbabić - resurs: `/restaurants`
 - **Student B**: Hedija Šišić - resurs: `/foods`
 
 ## Instalacija i pokretanje
@@ -95,7 +105,21 @@ curl -X PUT "http://localhost:8000/foods/1" \
 ```
 
 ## Korištenje AI alata
+### Student A
+### Alat: Gemini
+**Model:** Gemini 3 pro
 
+**Primjer 1:**
+- **Prompt:** "Pokušavam implementirati DELETE rutu za restorane, ali dobijam grešku 404 čak i kada ID postoji. Možeš li provjeriti logiku pretrage objekta u bazi prije samog brisanja?"
+- **Kako je pomoglo:** AI je identifikovao logičku grešku u poretku komandi – pokušavala sam obrisati objekat prije nego što je sesija ```(session.exec) ```zapravo potvrdila njegovo postojanje.
+- **Prilagodbe:** Ispravljena je logika brisanja u routes_a.py, dodavanjem provjere ```if not restaurant: raise HTTPException.```
+
+**Primjer 2:**
+- **Prompt:** "Imam Restaurant model u SQLModel-u. Želim da spriječim korisnika da prilikom kreiranja restorana (POST) ručno šalje id, jer to baza treba sama generisati. Također, želim da polje rating bude vidljivo kada se restoran čita (GET), ali da ga nije moguće direktno unijeti pri kreiranju.
+- **Kako je pomoglo:** Predložio je kreiranje bazne klase ```RestaurantBase``` sa zajedničkim poljima, a zatim dvije odvojene klase: ```Restaurant``` (koja je table=True i ima id) i ```RestaurantCreate``` (koja se koristi samo za unos podataka). Objasnio je kako ovo razdvajanje modela povećava sigurnost API-ja.
+- **Prilagodbe:** Ovu arhitekturu sam primijenila u ```models_a.py```. Rezultat je sigurniji kod gdje FastAPI automatski filtrira polja koja korisnik ne smije slati, dok baza i dalje ispravno čuva sve podatke.
+
+### Student B
 ### Alat: Claude
 **Model:** claude-sonnet-4
 
@@ -108,6 +132,7 @@ curl -X PUT "http://localhost:8000/foods/1" \
 - **Prompt:** U FastAPI ruteru imam dvije GET rute: /{food_id} i /restaurants/{restaurant_id}. Aplikacija se pokreće bez greške ali ruta za restorane nikad ne vraća rezultate. Zašto?
 - **Kako je pomoglo:** AI je objasnio da FastAPI čita rute odozgo prema dolje i da specifičnije rute moraju biti definirane prije generalnih. Budući da je /{food_id} bila iznad /restaurants/{restaurant_id}, FastAPI je svaki zahtjev prema /restaurants/2 tumačio kao food_id = "restaurants"
 - **Prilagodbe:** Problem je riješen premještanjem get_foods_by_restaurant funkcije iznad get_food u routes_b.py.
+
 
 ## Napomene
 
