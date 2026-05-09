@@ -45,3 +45,18 @@ def update_food(food_id: int, food_update: FoodCreate, session: Session = Depend
     session.commit()
     session.refresh(food)
     return food
+
+@router.patch("/{food_id}")
+def partial_update_food(food_id: int, food_update: FoodUpdate, session: Session = Depends(get_session)):
+    food = session.get(Food, food_id)
+    if not food:
+        raise HTTPException(status_code=404, detail="Food not found")
+    
+    food_data = food_update.dict(exclude_unset=True)
+    for key, value in food_data.items():
+        setattr(food, key, value)
+    
+    session.add(food)
+    session.commit()
+    session.refresh(food)
+    return food
