@@ -17,3 +17,11 @@ class FoodCreate(SQLModel):
     calories: int
     available: bool = True
     description: Optional[str] = None
+
+class FoodUpdate(SQLModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    price: Optional[float] = None
+    calories: Optional[int] = None
+    available: Optional[bool] = None
+    description: Optional[str] = None
