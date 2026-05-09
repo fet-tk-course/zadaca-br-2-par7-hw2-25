@@ -10,3 +10,10 @@ router = APIRouter(prefix="/foods", tags=["Foods"])
 def get_all_foods(session: Session = Depends(get_session)):
     foods = session.exec(select(Food)).all()
     return foods
+
+@router.get("/{food_id}")
+def get_food(food_id: int, session: Session = Depends(get_session)):
+    food = session.get(Food, food_id)
+    if not food:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Food not found")
+    return food
