@@ -10,7 +10,6 @@ class Restaurant(SQLModel, table=True):
     is_open: bool = True
     address: Optional[str] = None
 
-
 class RestaurantCreate(SQLModel):
     name: str
     cuisine_type: str
