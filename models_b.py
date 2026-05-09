@@ -10,3 +10,10 @@ class Food(SQLModel, table=True):
     available: bool = True
     description: Optional[str] = None
 
+class FoodCreate(SQLModel):
+    name: str
+    category: str
+    price: float
+    calories: int
+    available: bool = True
+    description: Optional[str] = None
