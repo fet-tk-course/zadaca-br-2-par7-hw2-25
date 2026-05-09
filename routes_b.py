@@ -15,12 +15,14 @@ def get_all_foods(session: Session = Depends(get_session)):
 def get_food(food_id: int, session: Session = Depends(get_session)):
     food = session.get(Food, food_id)
     if not food:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Food not found")
+        raise HTTPException(status_code=404, detail=f"Jelo sa ID-om {food_id} nije pronađeno")
     return food
 
 @router.get("/restaurants/{restaurant_id}")
 def get_foods_by_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
     foods = session.exec(select(Food).where(Food.restaurant_id == restaurant_id)).all()
+    if not foods:
+        raise HTTPException(status_code=404, detail=f"Nema jela za restoran sa ID-om {restaurant_id}")
     return foods
 
 @router.post("/", status_code=201)
@@ -35,7 +37,7 @@ def create_food(food: FoodCreate, session: Session = Depends(get_session)):
 def update_food(food_id: int, food_update: FoodCreate, session: Session = Depends(get_session)):
     food = session.get(Food, food_id)
     if not food:
-        raise HTTPException(status_code=404, detail="Food not found")
+        raise HTTPException(status_code=404, detail=f"Jelo sa ID-om {food_id} nije pronađeno")
     
     food_data = food_update.dict(exclude_unset=True)
     for key, value in food_data.items():
@@ -50,7 +52,7 @@ def update_food(food_id: int, food_update: FoodCreate, session: Session = Depend
 def partial_update_food(food_id: int, food_update: FoodUpdate, session: Session = Depends(get_session)):
     food = session.get(Food, food_id)
     if not food:
-        raise HTTPException(status_code=404, detail="Food not found")
+        raise HTTPException(status_code=404, detail=f"Jelo sa ID-om {food_id} nije pronađeno")
     
     food_data = food_update.dict(exclude_unset=True)
     for key, value in food_data.items():
@@ -65,7 +67,7 @@ def partial_update_food(food_id: int, food_update: FoodUpdate, session: Session 
 def delete_food(food_id: int, session: Session = Depends(get_session)):
     food = session.get(Food, food_id)
     if not food:
-        raise HTTPException(status_code=404, detail="Food not found")
+        raise HTTPException(status_code=404, detail=f"Jelo sa ID-om {food_id} nije pronađeno")
     
     session.delete(food)
     session.commit()
