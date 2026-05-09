@@ -8,7 +8,7 @@
 ## Tim
 
 - **Student A**: [Ime Prezime] - resurs: `/resursi_a`
-- **Student B**: [Ime Prezime] - resurs: `/resursi_b`
+- **Student B**: Hedija Šišić - resurs: `/foods`
 
 ## Instalacija i pokretanje
 
@@ -67,25 +67,38 @@ curl -X POST "http://localhost:8000/resursi_a" \
   -d '{"polje1": "vrijednost", "polje2": 123}'
 ```
 
-### Resurs B: `/resursi_b`
+### Resurs B: `/foods`
 
-[Analogno kao za Resurs A]
+| Metoda | Ruta | Opis |
+|--------|------|------|
+| GET | `/foods` | Lista svih resursa |
+| GET | `/foods/{id}` | Dohvatanje jela po ID-u |
+| GET | `//foods/restaurants/{restaurant_id}` | Dohvatanje svih jela određenog restorana |
+| POST | `/foods` | Kreiranje novog jela |
+| PUT | `/foods/{id}` | Potpuna zamjena jela |
+| PATCH | `/foods/{id}` | Djelimično ažuriranje jela |
+| DELETE | `/foods/{id}` | Brisanje jela |
+
+**Primjer zahtjeva:**
+```bash
+# Potpuna zamjena jela
+curl -X PUT "http://localhost:8000/foods/1" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Pica Margherita", "restaurant_id": 1, "category": "pizza", "price": 9.00, "calories": 780, "available": true, "description": "Azurirana pica s mocarelom"}'
+```
 
 ## Korištenje AI alata
 
-### Alat: [GitHub Copilot / ChatGPT / ...]
-**Model:** [GPT-4, Copilot model, ...]
+### Alat: Claude
+**Model:** claude-sonnet-4
 
 **Primjer 1:**
-- **Prompt:** [Npr. "Kreiraj SQLModel klasu za entitet Knjiga sa poljima naslov, autor, godina, isbn"]
-- **Kako je pomoglo:** [Opis]
-- **Prilagodbe:** [Da li ste morali prilagoditi generisani kod]
+- **Prompt:** U SQLModel-u, ako imam Food entitet koji ima foreign key prema Restaurant tabeli, da li je bitno u kojem redoslijedu su polja definisana unutar klase? Treba li restaurant_id biti odmah nakon id ili može biti bilo gdje?"
+- **Kako je pomoglo:** AI je potvrdio da redoslijed polja u SQLModel klasi ne utiče na funkcionalnost baze, ali je preporučio da se restaurant_id stavi odmah nakon id zbog čitljivosti.
+- **Prilagodbe:** Dati prijedlog je primjenjen u finalnoj verziji models_b.py
 
 **Primjer 2:**
-- **Prompt:** [Npr. "Implementiraj PATCH endpoint sa exclude_unset=True"]
-- **Kako je pomoglo:** [Opis]
-- **Prilagodbe:** [Opis]
+- **Prompt:** U FastAPI ruteru imam dvije GET rute: /{food_id} i /restaurants/{restaurant_id}. Aplikacija se pokreće bez greške ali ruta za restorane nikad ne vraća rezultate. Zašto?
+- **Kako je pomoglo:** AI je objasnio da FastAPI čita rute odozgo prema dolje i da specifičnije rute moraju biti definirane prije generalnih. Budući da je /{food_id} bila iznad /restaurants/{restaurant_id}, FastAPI je svaki zahtjev prema /restaurants/2 tumačio kao food_id = "restaurants"
+- **Prilagodbe:** Problem je riješen premještanjem get_foods_by_restaurant funkcije iznad get_food u routes_b.py.
 
-## Napomene
-
-[Dodatne napomene specifične za vašu implementaciju]
