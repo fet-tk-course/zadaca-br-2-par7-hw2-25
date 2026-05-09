@@ -22,3 +22,11 @@ def get_food(food_id: int, session: Session = Depends(get_session)):
 def get_foods_by_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
     foods = session.exec(select(Food).where(Food.restaurant_id == restaurant_id)).all()
     return foods
+
+@router.post("/", status_code=201)
+def create_food(food: FoodCreate, session: Session = Depends(get_session)):
+    new_food = Food.from_orm(food)
+    session.add(new_food)
+    session.commit()
+    session.refresh(new_food)
+    return new_food
