@@ -7,7 +7,7 @@
 
 ## Tim
 
-- **Student A**: [Ime Prezime] - resurs: `/resursi_a`
+- **Student A**: [Lamija Altumbabić] - resurs: `/restaurants`
 - **Student B**: [Ime Prezime] - resurs: `/resursi_b`
 
 ## Instalacija i pokretanje
@@ -48,23 +48,30 @@ uvicorn main:app --reload
 
 ## API Endpointi
 
-### Resurs A: `/resursi_a`
+### Resurs A: `/restaurants`
 
 | Metoda | Ruta | Opis |
 |--------|------|------|
-| GET | `/resursi_a` | Lista svih resursa (sa query filterom) |
-| GET | `/resursi_a/{id}` | Dohvatanje resursa po ID-u |
-| POST | `/resursi_a` | Kreiranje novog resursa |
-| PUT | `/resursi_a/{id}` | Potpuna zamjena resursa |
-| PATCH | `/resursi_a/{id}` | Djelimično ažuriranje resursa |
-| DELETE | `/resursi_a/{id}` | Brisanje resursa |
+| GET | `/restaurants` | Lista svih resursa (sa query filterom) |
+| GET | `/restaurants/{id}` | Dohvatanje resursa po ID-u |
+| POST | `/restaurants` | Kreiranje novog resursa |
+| PUT | `/restaurants/{id}` | Potpuna zamjena resursa |
+| PATCH | `/restaurants/{id}` | Djelimično ažuriranje resursa |
+| DELETE | `/restaurants/{id}` | Brisanje resursa |
 
 **Primjer zahtjeva:**
 ```bash
-# Kreiranje novog resursa
-curl -X POST "http://localhost:8000/resursi_a" \
+# Kreiranje novog restorana
+curl -X POST "http://localhost:8000/restaurants" \
   -H "Content-Type: application/json" \
-  -d '{"polje1": "vrijednost", "polje2": 123}'
+  -d '{
+        "name": "Limenka", 
+        "cuisine_type": "Cevapi", 
+        "delivery_fee": 3.5, 
+        "rating": 5, 
+        "is_open": true, 
+        "address": "Patriotske lige 24"
+}'
 ```
 
 ### Resurs B: `/resursi_b`
