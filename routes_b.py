@@ -30,3 +30,18 @@ def create_food(food: FoodCreate, session: Session = Depends(get_session)):
     session.commit()
     session.refresh(new_food)
     return new_food
+
+@router.put("/{food_id}")
+def update_food(food_id: int, food_update: FoodCreate, session: Session = Depends(get_session)):
+    food = session.get(Food, food_id)
+    if not food:
+        raise HTTPException(status_code=404, detail="Food not found")
+    
+    food_data = food_update.dict(exclude_unset=True)
+    for key, value in food_data.items():
+        setattr(food, key, value)
+    
+    session.add(food)
+    session.commit()
+    session.refresh(food)
+    return food
