@@ -6,6 +6,7 @@ class Food(SQLModel, table=True):
     name: str
     category: str
     price: float
+    calories: int
     available: bool = True
     description: Optional[str] = None
 
