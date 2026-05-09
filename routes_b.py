@@ -11,6 +11,13 @@ def get_all_foods(session: Session = Depends(get_session)):
     foods = session.exec(select(Food)).all()
     return foods
 
+@router.get("/restaurants/{restaurant_id}")
+def get_foods_by_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
+    foods = session.exec(select(Food).where(Food.restaurant_id == restaurant_id)).all()
+    if not foods:
+        raise HTTPException(status_code=404, detail=f"Nema jela za restoran sa ID-om {restaurant_id}")
+    return foods
+
 @router.get("/{food_id}")
 def get_food(food_id: int, session: Session = Depends(get_session)):
     food = session.get(Food, food_id)
@@ -18,12 +25,6 @@ def get_food(food_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail=f"Jelo sa ID-om {food_id} nije pronađeno")
     return food
 
-@router.get("/restaurants/{restaurant_id}")
-def get_foods_by_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
-    foods = session.exec(select(Food).where(Food.restaurant_id == restaurant_id)).all()
-    if not foods:
-        raise HTTPException(status_code=404, detail=f"Nema jela za restoran sa ID-om {restaurant_id}")
-    return foods
 
 @router.post("/", status_code=201)
 def create_food(food: FoodCreate, session: Session = Depends(get_session)):
