@@ -3,6 +3,7 @@ from typing import Optional
 
 class Food(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    restaurant_id: int = Field(foreign_key="restaurant.id")
     name: str
     category: str
     price: float
@@ -12,6 +13,7 @@ class Food(SQLModel, table=True):
 
 class FoodCreate(SQLModel):
     name: str
+    restaurant_id: int
     category: str
     price: float
     calories: int
@@ -20,6 +22,7 @@ class FoodCreate(SQLModel):
 
 class FoodUpdate(SQLModel):
     name: Optional[str] = None
+    restaurant_id: Optional[int] = None
     category: Optional[str] = None
     price: Optional[float] = None
     calories: Optional[int] = None
