@@ -17,3 +17,8 @@ def get_food(food_id: int, session: Session = Depends(get_session)):
     if not food:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Food not found")
     return food
+
+@router.get("/restaurants/{restaurant_id}")
+def get_foods_by_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
+    foods = session.exec(select(Food).where(Food.restaurant_id == restaurant_id)).all()
+    return foods
