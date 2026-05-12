@@ -1,13 +1,24 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/wxDq4rbD)
 # Zadaća 2 - REST API aplikacija
 
 ## O projektu
 
-[Ovdje ukratko opišite domenu vaše aplikacije i njenu svrhu]
+Ovaj repozitorij sadrži backend aplikaciju za sistem dostave hrane, razvijenu pomoću **FastAPI** okvira i **SQLModel** biblioteke za upravljanje bazom podataka.
+
+## Domena i svrha aplikacije
+**Domena:** Ova aplikacija pripada domeni dostave hrane i upravljanja ugostiteljskim resursima. Sistem je dizajniran da simulira backend platforme za naručivanje hrane.
+
+**Svrha:** 
+Glavna svrha aplikacije je omogućiti **digitalnu evidenciju i upravljanje podacima o restoranima i njihovoj ponudi jela**. API je dizajniran da administratorima i partnerima omogući:
+
+* **Upravljanje restoranima:** Praćenje informacija o radnom vremenu, lokaciji, tipu kuhinje i ocjenama korisnika.
+* **Upravljanje ponudom jela:** Evidenciju dostupnih jela, njihovih cijena, kategorija i nutritivnih informacija.
+* **Pretragu i filtriranje:** Brzi uvid u to koji su restorani trenutno otvoreni ili koja su jela dostupna u određenom cjenovnom rangu.
 
 ## Tim
 
-- **Student A**: [Ime Prezime] - resurs: `/resursi_a`
-- **Student B**: [Ime Prezime] - resurs: `/resursi_b`
+- **Student A**: Lamija Altumbabić - resurs: `/restaurants`
+- **Student B**: Hedija Šišić - resurs: `/foods`
 
 ## Instalacija i pokretanje
 
@@ -47,43 +58,84 @@ uvicorn main:app --reload
 
 ## API Endpointi
 
-### Resurs A: `/resursi_a`
+### Resurs A: `/restaurants`
 
 | Metoda | Ruta | Opis |
 |--------|------|------|
-| GET | `/resursi_a` | Lista svih resursa (sa query filterom) |
-| GET | `/resursi_a/{id}` | Dohvatanje resursa po ID-u |
-| POST | `/resursi_a` | Kreiranje novog resursa |
-| PUT | `/resursi_a/{id}` | Potpuna zamjena resursa |
-| PATCH | `/resursi_a/{id}` | Djelimično ažuriranje resursa |
-| DELETE | `/resursi_a/{id}` | Brisanje resursa |
+| GET | `/restaurants` | Lista svih resursa (sa query filterom) |
+| GET | `/restaurants/{id}` | Dohvatanje resursa po ID-u |
+| POST | `/restaurants` | Kreiranje novog resursa |
+| PUT | `/restaurants/{id}` | Potpuna zamjena resursa |
+| PATCH | `/restaurants/{id}` | Djelimično ažuriranje resursa |
+| DELETE | `/restaurants/{id}` | Brisanje resursa |
 
 **Primjer zahtjeva:**
 ```bash
-# Kreiranje novog resursa
-curl -X POST "http://localhost:8000/resursi_a" \
+# Kreiranje novog restorana
+curl -X POST "http://localhost:8000/restaurants" \
   -H "Content-Type: application/json" \
-  -d '{"polje1": "vrijednost", "polje2": 123}'
+  -d '{
+        "name": "Limenka", 
+        "cuisine_type": "Cevapi", 
+        "delivery_fee": 3.5, 
+        "rating": 5, 
+        "is_open": true, 
+        "address": "Patriotske lige 24"
+}'
 ```
 
-### Resurs B: `/resursi_b`
+### Resurs B: `/foods`
 
-[Analogno kao za Resurs A]
+| Metoda | Ruta | Opis |
+|--------|------|------|
+| GET | `/foods?restaurant_id=3` | Lista svih jela sa opcionalnim query parametrom |
+| GET | `/foods/{id}` | Dohvatanje jela po ID-u |
+| POST | `/foods` | Kreiranje novog jela |
+| PUT | `/foods/{id}` | Potpuna zamjena jela |
+| PATCH | `/foods/{id}` | Djelimično ažuriranje jela |
+| DELETE | `/foods/{id}` | Brisanje jela |
+
+**Primjer zahtjeva:**
+```bash
+# Potpuna zamjena jela
+curl -X PUT "http://localhost:8000/foods/1" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Pica Margherita", "restaurant_id": 1, "category": "pizza", "price": 9.00, "calories": 780, "available": true, "description": "Azurirana pica s mocarelom"}'
+```
 
 ## Korištenje AI alata
-
-### Alat: [GitHub Copilot / ChatGPT / ...]
-**Model:** [GPT-4, Copilot model, ...]
+### Student A
+### Alat: Gemini
+**Model:** Gemini 3 pro
 
 **Primjer 1:**
-- **Prompt:** [Npr. "Kreiraj SQLModel klasu za entitet Knjiga sa poljima naslov, autor, godina, isbn"]
-- **Kako je pomoglo:** [Opis]
-- **Prilagodbe:** [Da li ste morali prilagoditi generisani kod]
+- **Prompt:** "Pokušavam implementirati DELETE rutu za restorane, ali dobijam grešku 404 čak i kada ID postoji. Možeš li provjeriti logiku pretrage objekta u bazi prije samog brisanja?"
+- **Kako je pomoglo:** AI je identifikovao logičku grešku u poretku komandi – pokušavala sam obrisati objekat prije nego što je sesija ```(session.exec) ```zapravo potvrdila njegovo postojanje.
+- **Prilagodbe:** Ispravljena je logika brisanja u routes_a.py, dodavanjem provjere ```if not restaurant: raise HTTPException.```
 
 **Primjer 2:**
-- **Prompt:** [Npr. "Implementiraj PATCH endpoint sa exclude_unset=True"]
-- **Kako je pomoglo:** [Opis]
-- **Prilagodbe:** [Opis]
+- **Prompt:** "Imam Restaurant model u SQLModel-u. Želim da spriječim korisnika da prilikom kreiranja restorana (POST) ručno šalje id, jer to baza treba sama generisati. Također, želim da polje rating bude vidljivo kada se restoran čita (GET), ali da ga nije moguće direktno unijeti pri kreiranju.
+- **Kako je pomoglo:** Predložio je kreiranje bazne klase ```RestaurantBase``` sa zajedničkim poljima, a zatim dvije odvojene klase: ```Restaurant``` (koja je table=True i ima id) i ```RestaurantCreate``` (koja se koristi samo za unos podataka). Objasnio je kako ovo razdvajanje modela povećava sigurnost API-ja.
+- **Prilagodbe:** Ovu arhitekturu sam primijenila u ```models_a.py```. Rezultat je sigurniji kod gdje FastAPI automatski filtrira polja koja korisnik ne smije slati, dok baza i dalje ispravno čuva sve podatke.
+
+### Student B
+### Alat: Claude
+**Model:** claude-sonnet-4
+
+**Primjer 1:**
+- **Prompt:** U SQLModel-u, ako imam Food entitet koji ima foreign key prema Restaurant tabeli, da li je bitno u kojem redoslijedu su polja definisana unutar klase? Treba li restaurant_id biti odmah nakon id ili može biti bilo gdje?"
+- **Kako je pomoglo:** AI je potvrdio da redoslijed polja u SQLModel klasi ne utiče na funkcionalnost baze, ali je preporučio da se restaurant_id stavi odmah nakon id zbog čitljivosti.
+- **Prilagodbe:** Dati prijedlog je primjenjen u finalnoj verziji models_b.py
+
+**Primjer 2:**
+- **Prompt:** U FastAPI ruteru imam dvije GET rute: /{food_id} i /restaurants/{restaurant_id}. Aplikacija se pokreće bez greške ali ruta za restorane nikad ne vraća rezultate. Zašto?
+- **Kako je pomoglo:** AI je objasnio da FastAPI čita rute odozgo prema dolje i da specifičnije rute moraju biti definirane prije generalnih. Budući da je /{food_id} bila iznad /restaurants/{restaurant_id}, FastAPI je svaki zahtjev prema /restaurants/2 tumačio kao food_id = "restaurants"
+- **Prilagodbe:** Problem je riješen premještanjem get_foods_by_restaurant funkcije iznad get_food u routes_b.py.
+
+**Primjer 3:**
+- **Prompt:** Imam FastAPI endpoint koji vraća svu hranu. Kako da ga proširim da može filtrirati hranu po restaurant_id, ali da restaurant_id bude opcionalan parametar?
+- **Kako je pomoglo:** AI je predložio spajanje dva endpointa u jedan koristeći Optional[int] kao tip parametra, gdje se filtriranje primjenjuje samo ako je parametar proslijeđen.
+- **Prilagodbe:** AI-jev prijedlog nije uključivao provjeru slučaja kada restoran postoji, ali nema registriranih jela. Kako bi endpoint bio robusniji, dodala sam 404 provjeru kao dodan sloj validacije. Ova provjera osigurava da se greška vraća samo kada je filter aktivan — odnosno kada korisnik traži jela konkretnog restorana, a lista je prazna. Na taj način endpoint i dalje ispravno vraća praznu listu kada se dohvaća sva hrana bez filtera.
 
 ## Napomene
 
