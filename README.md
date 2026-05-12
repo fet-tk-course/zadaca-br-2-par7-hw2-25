@@ -71,9 +71,8 @@ curl -X POST "http://localhost:8000/resursi_a" \
 
 | Metoda | Ruta | Opis |
 |--------|------|------|
-| GET | `/foods` | Lista svih resursa |
+| GET | `/foods?restaurant_id=3` | Lista svih jela sa opcionalnim query parametrom |
 | GET | `/foods/{id}` | Dohvatanje jela po ID-u |
-| GET | `//foods/restaurants/{restaurant_id}` | Dohvatanje svih jela određenog restorana |
 | POST | `/foods` | Kreiranje novog jela |
 | PUT | `/foods/{id}` | Potpuna zamjena jela |
 | PATCH | `/foods/{id}` | Djelimično ažuriranje jela |
