@@ -132,6 +132,10 @@ curl -X PUT "http://localhost:8000/foods/1" \
 - **Kako je pomoglo:** AI je objasnio da FastAPI čita rute odozgo prema dolje i da specifičnije rute moraju biti definirane prije generalnih. Budući da je /{food_id} bila iznad /restaurants/{restaurant_id}, FastAPI je svaki zahtjev prema /restaurants/2 tumačio kao food_id = "restaurants"
 - **Prilagodbe:** Problem je riješen premještanjem get_foods_by_restaurant funkcije iznad get_food u routes_b.py.
 
+**Primjer 3:**
+- **Prompt:** Imam FastAPI endpoint koji vraća svu hranu. Kako da ga proširim da može filtrirati hranu po restaurant_id, ali da restaurant_id bude opcionalan parametar?
+- **Kako je pomoglo:** AI je predložio spajanje dva endpointa u jedan koristeći Optional[int] kao tip parametra, gdje se filtriranje primjenjuje samo ako je parametar proslijeđen.
+- **Prilagodbe:** AI-jev prijedlog nije uključivao provjeru slučaja kada restoran postoji, ali nema registriranih jela. Kako bi endpoint bio robusniji, dodala sam 404 provjeru kao dodan sloj validacije. Ova provjera osigurava da se greška vraća samo kada je filter aktivan — odnosno kada korisnik traži jela konkretnog restorana, a lista je prazna. Na taj način endpoint i dalje ispravno vraća praznu listu kada se dohvaća sva hrana bez filtera.
 
 ## Napomene
 
