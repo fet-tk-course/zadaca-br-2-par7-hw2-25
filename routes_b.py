@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, select
 
 from database import get_session
@@ -7,15 +9,17 @@ from models_b import Food, FoodCreate, FoodUpdate
 router = APIRouter(prefix="/foods", tags=["Foods"])
 
 @router.get("/")
-def get_all_foods(session: Session = Depends(get_session)):
-    foods = session.exec(select(Food)).all()
-    return foods
+def get_foods(restaurant_id: Optional[int] = Query(default=None), session: Session = Depends(get_session)):
+    query = select(Food)
 
-@router.get("/restaurants/{restaurant_id}")
-def get_foods_by_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
-    foods = session.exec(select(Food).where(Food.restaurant_id == restaurant_id)).all()
-    if not foods:
-        raise HTTPException(status_code=404, detail=f"Nema jela za restoran sa ID-om {restaurant_id}")
+    if restaurant_id is not None:
+        query = query.where(Food.restaurant_id == restaurant_id)
+
+    foods = session.exec(query).all()
+
+    if restaurant_id is not None and not foods:
+        raise HTTPException(status_code=404, detail="Nema dostupnih jela")
+
     return foods
 
 @router.get("/{food_id}")
