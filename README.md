@@ -105,3 +105,13 @@ curl -X PUT "http://localhost:8000/foods/1" \
 - **Prompt:** Imam FastAPI endpoint koji vraća svu hranu. Kako da ga proširim da može filtrirati hranu po restaurant_id, ali da restaurant_id bude opcionalan parametar?
 - **Kako je pomoglo:** AI je predložio spajanje dva endpointa u jedan koristeći Optional[int] kao tip parametra, gdje se filtriranje primjenjuje samo ako je parametar proslijeđen.
 - **Prilagodbe:** AI-jev prijedlog nije uključivao provjeru slučaja kada restoran postoji, ali nema registriranih jela. Kako bi endpoint bio robusniji, dodala sam 404 provjeru kao dodan sloj validacije. Ova provjera osigurava da se greška vraća samo kada je filter aktivan — odnosno kada korisnik traži jela konkretnog restorana, a lista je prazna. Na taj način endpoint i dalje ispravno vraća praznu listu kada se dohvaća sva hrana bez filtera.
+
+### Provjera zadaće
+
+U dijelu pod a prvog zadatka, dodali smo tri validatora, dva za ime i jedan za cijenu hrane. Prvi provjerava da li je naziv prazan string, i ukoliko jeste isisuje adevkvatnu poruku. Drugi provjerava da li je duzina imena manja od dva karaktera, sto isto tako nije moguce. Treci validator prvjerava da li je cijena manja ili jednaka nuli, sto takodje nije moguce.
+
+Tako da prilikom izvršavanja endpointa, ukoliko je i jedan od uslova u validatorima ispunjen, ispisat ce se adekvatna poruka.
+
+U zadatku 1 u dijelu pod b, dodana je provjera vec postojece hrane u post endpointu. Na taj nacin se nece moci kreirati hrana sa istim id-em i bacit ce se iznimka prilikom kreiranja.
+
+Model Food ima strani ključ restaurant_id koji povezuje resurs Food sa resursom Restaurant. Svako jelo mora pripadati postojećem restoranu. Mogu nastati greske u kreiranju ako ne znamo tacan id restorana u kojem pravimo jelo, jer su dva modela odvojena. Morali bi prvo naci tacan id restorana za koji pravimo jelo, pa onda napraviti dato jelo, obzirom da baza sama pravi id-eve. 
