@@ -109,6 +109,78 @@ curl -X PUT "http://localhost:8000/foods/1" \
 - **Kako je pomoglo:** AI je objasnio da FastAPI čita rute odozgo prema dolje i da specifičnije rute moraju biti definirane prije generalnih. Budući da je /{food_id} bila iznad /restaurants/{restaurant_id}, FastAPI je svaki zahtjev prema /restaurants/2 tumačio kao food_id = "restaurants"
 - **Prilagodbe:** Problem je riješen premještanjem get_foods_by_restaurant funkcije iznad get_food u routes_b.py.
 
-## Napomene
+# Provjera Zadaće 2
+## Z1
 
-[Dodatne napomene specifične za vašu implementaciju]
+U prvom zadatku su dodati validatori za pola "name" i "rating". Prvi validator provjerava da li je unešen naziv restorana, i ako nije šalje upozorenje da naziv restorana ne smije biti prazan.
+
+ ```bash 
+@field_validator('name')
+@classmethod
+def naziv_ne_smije_biti_prazan(cls, v):
+    if not v.strip():
+        raise ValueError('Naziv restorana ne smije biti prazan')
+    return v.strip() 
+ ```
+
+ Drugi validator provjerava da li je unešena ocjena vrijednost od 1 do 5, i ako je ocjena izvan tog raspona šalje upozorenje.
+
+  ```bash 
+
+@field_validator('rating')
+@classmethod
+def raspon_ocjene(cls, v):
+    if v < 1 or v > 5:
+        raise ValueError('Ocjena mora biti u rasponu od 1 do 5')
+    return v
+   ```
+
+
+Unutar POST endpointa je dodata provjera koja vraća HTTP 409 konflikt u slučaju da već postoji restoran sa datim imenom, tačnije duplikat.
+
+ ```bash 
+ duplikat_restorana = session.exec(
+        select(Restaurant).where(Restaurant.name == restaurant.name)
+    ).first()
+    
+    if duplikat_restorana:
+        raise HTTPException(
+            status_code=409, 
+            detail=f"Restoran sa tim nazivom već postoji."
+        )
+```
+## Z2
+
+Dodat je custom GET endpoint, koji vraća ukupan broj restorana.
+
+``` bash
+@router.get("/count")
+def count_restaurants(session: Session = Depends(get_session)):
+    count = session.exec(select(Restaurant)).count()
+    return {"count": count}
+```
+## Primjer zahtjeva i očekivanog odgovora :
+
+### Novi endpoint : 
+**/restaurants/count**
+
+Zahtjev : 
+``` bash
+curl -X GET "http://localhost:8000/restaurants/count" \
+  -H "Accept: application/json"
+```
+Odgovor : 
+
+``` bash
+{
+  "ukupno": 42
+}
+
+```
+
+## Opis validacijskih pravila
+
+U slučaju bilo kakvog kršenja validacijskih pravila API vraća : 
+``` HTTP 422 Unprocessable Entity ```
+
+

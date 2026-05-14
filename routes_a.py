@@ -21,6 +21,13 @@ def get_all_restaurants(
     restaurants = session.exec(query).all()
     return restaurants
 
+
+@router.get("/count")
+def count_restaurants(session: Session = Depends(get_session)):
+    count = session.exec(select(Restaurant)).count()
+    return {"ukupno": count}
+
+
 @router.get("/{restaurant_id}")
 def get_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
     restaurant = session.get(Restaurant, restaurant_id)
@@ -32,11 +39,24 @@ def get_restaurant(restaurant_id: int, session: Session = Depends(get_session)):
 
 @router.post("/", status_code=201)  
 def create_restaurant(restaurant: RestaurantCreate, session: Session = Depends(get_session)):
+
+    duplikat_restorana = session.exec(
+        select(Restaurant).where(Restaurant.name == restaurant.name)
+    ).first()
+    
+    if duplikat_restorana:
+        raise HTTPException(
+            status_code=409, 
+            detail=f"Restoran sa tim nazivom već postoji."
+        )
+    
     new_restaurant = Restaurant.from_orm(restaurant)
     session.add(new_restaurant)
     session.commit()
     session.refresh(new_restaurant)
     return new_restaurant
+
+
 
 
 @router.put("/{restaurant_id}")
@@ -81,3 +101,6 @@ def delete_restaurant(restaurant_id: int, session: Session = Depends(get_session
     session.delete(restaurant)
     session.commit()
     return None
+
+
+

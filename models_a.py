@@ -30,14 +30,14 @@ class RestaurantUpdate(SQLModel):
     address: Optional[str] = None
 
 
-@field_validator('naziv')
+@field_validator('name')
 @classmethod
 def naziv_ne_smije_biti_prazan(cls, v):
     if not v.strip():
         raise ValueError('Naziv restorana ne smije biti prazan')
     return v.strip() 
 
-@field_validator('ocjena')
+@field_validator('rating')
 @classmethod
 def raspon_ocjene(cls, v):
     if v < 1 or v > 5:
