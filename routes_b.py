@@ -32,6 +32,17 @@ def get_food(food_id: int, session: Session = Depends(get_session)):
 
 @router.post("/", status_code=201)
 def create_food(food: FoodCreate, session: Session = Depends(get_session)):
+
+    existing = session.exec(
+        select(Food).where(
+            Food.name==food.name,
+            Food.restaurant_id == food.restaurant_id
+        )
+    )
+    if existing :
+        raise HTTPException(
+            status_code=409, detail={"Hrana sa datim nazivom vec postoji."}
+        )
     new_food = Food.from_orm(food)
     session.add(new_food)
     session.commit()
