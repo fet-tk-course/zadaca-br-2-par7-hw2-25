@@ -22,6 +22,11 @@ def get_foods(restaurant_id: Optional[int] = Query(default=None), session: Sessi
 
     return foods
 
+@router.get("/foods/count")
+def get_food_count(session: Session = Depends(get_session)):
+    foods = session.exec(select(Food)).all()
+    return {"ukupno hrane": len(foods)}
+
 @router.get("/{food_id}")
 def get_food(food_id: int, session: Session = Depends(get_session)):
     food = session.get(Food, food_id)
